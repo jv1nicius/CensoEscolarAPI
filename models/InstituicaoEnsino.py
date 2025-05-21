@@ -1,3 +1,37 @@
+from marshmallow import Schema, fields, validate
+
+class InstituicaoEnsinoSchema(Schema):
+    id = fields.Integer(required=True, error_messages={"required": "ID é obrigatório."})
+    no_entidade = fields.String(validate=validate.Length(min=2, max=100),
+                                required=True, error_messages={"required": "Nome da Entidade é obrigatório."})
+    co_entidade = fields.Integer(required=True, error_messages={
+                                 "required": "Código da Entidade é obrigatório."})
+    qt_mat_bas = fields.Integer(required=True, error_messages={
+        "required": "Quantidade de Matrículas Básicas é obrigatória."})
+    qt_mat_eja = fields.Integer(required=True, error_messages={
+        "required": "Quantidade de Matrículas EJA é obrigatória."})
+    qt_mat_esp = fields.Integer(required=True, error_messages={
+        "required": "Quantidade de Matrículas Especiais é obrigatória."})
+    qt_mat_fund = fields.Integer(required=True, error_messages={
+        "required": "Quantidade de Matrículas do Fundamental é obrigatória."})
+    qt_mat_inf = fields.Integer(required=True, error_messages={
+        "required": "Quantidade de Matrículas da Educação Infantil é obrigatória."})
+    qt_mat_med = fields.Integer(required=True, error_messages={
+        "required": "Quantidade de Matrículas do Médio é obrigatória."})
+    qt_mat_prof = fields.Integer(required=True, error_messages={
+        "required": "Quantidade de Professores é obrigatória."})
+    no_regiao = fields.String(required=True, error_messages={
+        "required": "Nome da Região é obrigatório."})
+    co_regiao = fields.Integer(required=True, error_messages={
+        "required": "Código da Região é obrigatório."})
+    no_uf = fields.String(validate=validate.Length(min=2, max=2), required=True, error_messages={
+        "required": "Nome da UF é obrigatório."})
+    sg_uf = fields.String(validate=validate.Length(min=2, max=2), required=True, error_messages={
+        "required": "Sigla da UF é obrigatória."})
+    co_uf = fields.Integer(required=True, error_messages={
+        "required": "Código da UF é obrigatório."})
+
+
 class InstituicaoEnsino:
     def __init__(self, ID, NO_ENTIDADE, CO_ENTIDADE, QT_MAT_BAS, QT_MAT_EJA, QT_MAT_ESP, QT_MAT_FUND, QT_MAT_INF, QT_MAT_MED, QT_MAT_PROF, NO_REGIAO, CO_REGIAO, NO_UF, SG_UF, CO_UF, NO_MUNICIPIO, CO_MUNICIPIO, NO_MESORREGIAO, CO_MESORREGIAO, NO_MICRORREGIAO, CO_MICRORREGIAO):
         self.id = ID
@@ -46,3 +80,44 @@ class InstituicaoEnsino:
             "NO_MICRORREGIAO": self.no_microrregiao,
             "CO_MICRORREGIAO": self.co_microrregiao
         }
+
+
+class UfSchema(Schema):
+    pass
+
+class Uf:
+    def __init__(self,):
+        pass
+    def toDict(self):
+        pass
+    pass
+
+class MunicipioSchema(Schema):
+    pass
+
+class Municipio:
+    def __init__(self,):
+        pass
+    def toDict(self):
+        pass
+    pass
+
+class MicrorregiaoSchema(Schema):
+    pass
+
+class Microrregiao:
+    def __init__(self,):
+        pass
+    def toDict(self):
+        pass
+    pass
+
+class MesorregiaoSchema(Schema):
+    pass
+
+class Mesorregiao:
+    def __init__(self,):
+        pass
+    def toDict(self):
+        pass
+    pass
