@@ -2,7 +2,7 @@ import sqlite3
 import json
 
 # 1 - Abrir a conexão
-conn = sqlite3.connect('censoescolarExtrator.db')
+conn = sqlite3.connect('censoescolar.db')
 cursor = conn.cursor()
 
 #inserir estados
@@ -16,61 +16,63 @@ for item in dados:
     cursor.execute("""
         INSERT INTO tb_instituicao (
             no_regiao, co_regiao, no_uf, sg_uf, co_uf, no_municipio, co_municipio, no_mesorregiao, co_mesorregiao, no_microrregiao, co_microrregiao, no_entidade, co_entidade, qt_mat_bas, qt_mat_eja, qt_mat_esp, qt_mat_fund, qt_mat_inf, qt_mat_med, qt_mat_prof
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
-        item["no_regiao"], item["co_regiao"], item["no_uf"], item["sg_uf"], item["co_uf"], item["no_municipio"], item["co_municipio"], item["no_mesorregiao"], item["co_mesorregiao"], item["no_microrregiao"], item["co_microrregiao"], item["no_entidade"], item["co_entidade"], item["qt_mat_bas"], item["qt_mat_eja"], item["qt_mat_esp"], item["qt_mat_fund"], item["qt_mat_inf"], item["qt_mat_med"], item["qt_mat_prof"]
+        item["NO_REGIAO"], item["CO_REGIAO"], item["NO_UF"], item["SG_UF"], item["CO_UF"], item["NO_MUNICIPIO"], item["CO_MUNICIPIO"], item["NO_MESORREGIAO"], item["CO_MESORREGIAO"], item["NO_MICRORREGIAO"], item["CO_MICRORREGIAO"], item["NO_ENTIDADE"], item["CO_ENTIDADE"], item["QT_MAT_BAS"], item["QT_MAT_EJA"], item["QT_MAT_ESP"], item["QT_MAT_FUND"], item["QT_MAT_INF"], item["QT_MAT_MED"], item["QT_MAT_PROF"]
     ))
     
 with open("UFs.json", "r", encoding="utf-8") as ufs:
     dadosUf = json.load(ufs)
 for uf in dadosUf:
-    cursor.execute("INSERT INTO tb_uf (id, uf, nome, regiao) VALUES (?, ?, ?, ?)", (
-        uf['id'],
-        uf['sigla'],
-        uf['nome'],
+    cursor.execute("""
+        INSERT INTO tb_uf (id, uf, nome, regiao) VALUES (?, ?, ?, ?)
+    """, (
+        uf['id'], 
+        uf['sigla'], 
+        uf['nome'], 
         uf['regiao']['nome']
     ))
 
-with open("microrregioes.json", "r", encoding="utf-8") as microrregioesFile:
-    microrregioes = json.load(microrregioesFile)
-for mcrrg in microrregioes:
-    cursor.execute(
-        "INSERT INTO tb_messoregiao (cod_municipio, nome, cod_microrregiao, cod_mesorregiao, cod_uf) VALUES (?, ?, ?, ?, ?)",
-        (
-            mcrrg['id'],
-            mcrrg['nome'],
-            mcrrg['mesorregiao']['id'],
-            mcrrg['mesorregiao']['UF']['id']
-        )
-    )
-
-with open("municipios.json", "r", encoding="utf-8") as municipiosFile:
-    municipios = json.load(municipiosFile)
-for mncp in municipios:
-    cursor.execute(
-        "INSERT INTO tb_municipio (cod_municipio, nome, cod_microrregiao, cod_mesorregiao, cod_uf) VALUES (?, ?, ?, ?, ?)",
-        (
-            mncp['id'],
-            mncp['nome'],
-            mncp['microrregiao']['id'],
-            mncp['microrregiao']['mesorregiao']['id'],
-            mncp['microrregiao']['mesorregiao']['UF']['id']
-        )
-    )
-
+# Inserir dados na tabela tb_mesorregiao
 with open("mesorregioes.json", "r", encoding="utf-8") as mesorregioesFile:
     mesorregioes = json.load(mesorregioesFile)
 for msrg in mesorregioes:
-    cursor.execute(
-        "INSERT INTO tb_messoregiao (cod_municipio, nome, cod_microrregiao, cod_mesorregiao, cod_uf) VALUES (?, ?, ?, ?, ?)",
-        (
-            msrg['id'],
-            msrg['nome'],
-            msrg['microrregiao']['id'],
-            msrg['microrregiao']['mesorregiao']['id'],
-            msrg['microrregiao']['mesorregiao']['UF']['id']
-        )
-    )
+    cursor.execute("""
+        INSERT INTO tb_mesorregiao (id, nome, idUf) VALUES (?, ?, ?)
+    """, (
+        msrg['id'],
+        msrg['nome'],
+        msrg['UF']['id']
+    ))
+
+# Inserir dados na tabela tb_microrregiao
+with open("microrregioes.json", "r", encoding="utf-8") as microrregioesFile:
+    microrregioes = json.load(microrregioesFile)
+for mcrrg in microrregioes:
+    cursor.execute("""
+        INSERT INTO tb_microrregiao (id, nome, idMes, idUf, regiao) VALUES (?, ?, ?, ?, ?)
+    """, (
+        mcrrg['id'], 
+        mcrrg['nome'], 
+        mcrrg['mesorregiao']['id'],
+        mcrrg['mesorregiao']['UF']['id'], 
+        mcrrg['mesorregiao']['UF']['regiao']['nome']
+    ))
+
+# Inserir dados na tabela tb_municipio
+with open("municipios.json", "r", encoding="utf-8") as municipiosFile:
+    municipios = json.load(municipiosFile)
+for mncp in municipios:
+    cursor.execute("""
+        INSERT INTO tb_municipio (id, nome, idMes, idMicro, idUf, regiao) VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        mncp['id'], 
+        mncp['nome'], 
+        mncp['microrregiao']['mesorregiao']['id'], 
+        mncp['microrregiao']['id'], 
+        mncp['microrregiao']['mesorregiao']['UF']['id'],
+        mncp['microrregiao']['mesorregiao']['UF']['regiao']['nome']
+    ))
 
 conn.commit()
 conn.close()

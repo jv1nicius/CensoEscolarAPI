@@ -110,7 +110,7 @@ def instituicaoInsercaoResource():
         no_mesorregiao = instituicaoJson['no_mesorregiao']
         co_mesorregiao = instituicaoJson['co_mesorregiao']
         no_microrregiao = instituicaoJson['no_microrregiao']
-        co_microrregiao = instituicaoJson['co_microrregvirtualenv venviao']
+        co_microrregiao = instituicaoJson['co_microrregiao']
 
 
         conn = getConnection()
@@ -240,7 +240,6 @@ def instituicaoAtualizacaoResource(id):
             return jsonify({"mensagem": f"Erro ao atualizar: {str(e)}"}), 500
     finally:
         conn.close()
-        return jsonify(instituicaoAtualizada.toDict()), 200
 
 @app.route("/instituicoes/<int:id>", methods=["GET"])
 def instituicoesByIdResource(id):
@@ -282,3 +281,6 @@ def instituicoesByIdResource(id):
 
 
     return jsonify(instituicaoEnsino.toDict()), 200
+
+if __name__ == "__main__":
+    app.run(debug=True)

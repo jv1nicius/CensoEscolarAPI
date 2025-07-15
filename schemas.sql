@@ -37,7 +37,7 @@ CREATE TABLE tb_municipio (
     regiao TEXT,
     FOREIGN KEY (idMes) REFERENCES tb_mesorregiao(id),
     FOREIGN KEY (idMicro) REFERENCES tb_microrregiao(id),
-    FOREIGN key (idUf) REFERENCES tb_uf
+    FOREIGN key (idUf) REFERENCES tb_uf(id)
 );
 
 CREATE TABLE tb_instituicao (
@@ -62,5 +62,8 @@ CREATE TABLE tb_instituicao (
     qt_mat_inf INTEGER NOT NULL,
     qt_mat_med INTEGER NOT NULL,
     qt_mat_prof INTEGER NOT NULL,
-    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    FOREIGN KEY (co_uf) REFERENCES tb_uf(id),
+    FOREIGN KEY (co_municipio) REFERENCES tb_municipio(id),
+    FOREIGN KEY (co_mesorregiao) REFERENCES tb_mesorregiao(id),
+    FOREIGN KEY (co_microrregiao) REFERENCES tb_microrregiao(id)
 );
