@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS tb_uf;
-DROP TABLE IF EXISTS tb_mesorregiao;
-DROP TABLE IF EXISTS tb_microrregiao;
-DROP TABLE IF EXISTS tb_municipio;
 DROP TABLE IF EXISTS tb_instituicao;
+DROP TABLE IF EXISTS tb_municipio;
+DROP TABLE IF EXISTS tb_microrregiao;
+DROP TABLE IF EXISTS tb_mesorregiao;
+DROP TABLE IF EXISTS tb_uf;
 
 CREATE TABLE tb_uf (
     id INTEGER PRIMARY KEY,
@@ -30,8 +30,8 @@ CREATE TABLE tb_microrregiao (
 CREATE TABLE tb_municipio (
     id INTEGER PRIMARY KEY,
     nome TEXT NOT NULL,
-    idMes INTEGER NOT NULL,
     idMicro INTEGER NOT NULL,
+    idMes INTEGER NOT NULL,
     idUf INTEGER NOT NULL,
     FOREIGN KEY (idMes) REFERENCES tb_mesorregiao(id),
     FOREIGN KEY (idMicro) REFERENCES tb_microrregiao(id),
@@ -39,7 +39,7 @@ CREATE TABLE tb_municipio (
 );
 
 CREATE TABLE tb_instituicao (
-    co_entidade INTEGER PRIMARY KEY,
+    co_entidade INTEGER,
     no_entidade VARCHAR(200),
     nu_ano_censo INTEGER NOT NULL,
     no_regiao VARCHAR(100) NOT NULL,
@@ -60,6 +60,9 @@ CREATE TABLE tb_instituicao (
     qt_mat_inf INTEGER,
     qt_mat_med INTEGER,
     qt_mat_prof INTEGER,
+
+    PRIMARY KEY (co_entidade, nu_ano_censo),
+
     FOREIGN KEY (co_municipio) REFERENCES tb_municipio(id),
     FOREIGN KEY (co_mesorregiao) REFERENCES tb_mesorregiao(id),
     FOREIGN KEY (co_microrregiao) REFERENCES tb_microrregiao(id),
