@@ -1,0 +1,146 @@
+import psycopg2
+import json
+import pandas as pd
+
+
+DB_CONFIG = {
+    'dbname': 'postgres',
+    'user': 'postgres',
+    'password': '123456',
+    'host': 'localhost',
+    'port': 5434
+}
+
+conn = psycopg2.connect(
+    dbname=DB_CONFIG['dbname'],
+    user=DB_CONFIG['user'],
+    password=DB_CONFIG['password'],
+    host=DB_CONFIG['host'],
+    port=DB_CONFIG['port']
+)
+cursor = conn.cursor()
+
+#Inicializar o schema
+with open('schemas.sql', 'r') as f:
+    schema = f.read()
+    cursor.execute(schema)
+
+#Inicializar a tb_uf
+with open('./ufs.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+    for row in data:
+        cursor.execute(
+            "INSERT INTO tb_uf (id, uf, nome, regiao) VALUES (%s, %s, %s, %s)",
+            (row['id'], row['sigla'], row['nome'], row['regiao']['nome'])
+        )
+
+with open('./mesorregioes.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+    for row in data:
+        cursor.execute(
+            "INSERT INTO tb_mesorregiao (id, nome, idUf) VALUES (%s, %s, %s)",
+            (row['id'], row['nome'], row['UF']['id'])
+        )
+
+with open('./microrregioes.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+    for row in data:
+        cursor.execute(
+            """
+            INSERT INTO tb_microrregiao (id, nome, idMes, idUf)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (
+                row["id"],
+                row['nome'],
+                row['microrregiao']['mesorregiao']['id'],
+                row['microrregiao']['mesorregiao']['UF']['id'],
+            )
+        )
+        
+with open('./municipios.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+    for row in data:
+        cursor.execute(
+            """
+            INSERT INTO tb_municipio (id, nome, idMes, idMicro, idUf)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                row['id'],
+                row['nome'],
+                row['microrregiao']['mesorregiao']['id'],
+                row['microrregiao']['id'],
+                row['microrregiao']['mesorregiao']['UF']['id'],
+            )
+        )
+conn.commit()
+
+chunksize = 10000
+df_chunks = pd.read_csv('./microdados_ed_basica_2023.csv', chunksize=chunksize, encoding='ISO-8859-1', sep=';')
+
+colunas_escola = [
+    'CO_ENTIDADE', 'NO_ENTIDADE', 'NU_ANO_CENSO', 'NO_REGIAO', 'CO_REGIAO', 'NO_UF', 'SG_UF', 'CO_UF',
+    'NO_MUNICIPIO', 'CO_MUNICIPIO', 'NO_MESORREGIAO', 'CO_MESORREGIAO',
+    'NO_MICRORREGIAO', 'CO_MICRORREGIAO', 'QT_MAT_BAS', 'QT_MAT_EJA', 'QT_MAT_ESP', 'QT_MAT_FUND',
+    'QT_MAT_INF', 'QT_MAT_MED', 'QT_MAT_PROF'
+]
+
+for chunk in df_chunks:
+    escola = chunk[colunas_escola]
+
+    for _, row in escola.iterrows():
+        cursor.execute(
+            """
+            INSERT INTO tb_instituicao (
+                co_entidade, no_entidade, nu_ano_censo, no_regiao, co_regiao, no_uf, sg_uf, co_uf,
+                no_municipio, co_municipio, no_mesorregiao, co_mesorregiao,
+                no_microrregiao, co_microrregiao, qt_mat_bas, qt_mat_eja, qt_mat_esp,
+                qt_mat_fund, qt_mat_inf, qt_mat_med, qt_mat_prof
+            ) VALUES (
+                %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s
+            )
+            ON CONFLICT (co_entidade) DO NOTHING
+            """,
+            tuple(row.fillna(None))
+        )
+    conn.commit()
+    
+chunksize = 10000
+df_chunks = pd.read_csv('./microdados_ed_basica_2024.csv', chunksize=chunksize, encoding='ISO-8859-1', sep=';')
+
+colunas_escola = [
+    'CO_ENTIDADE', 'NO_ENTIDADE', 'NU_ANO_CENSO', 'NO_REGIAO', 'CO_REGIAO', 'NO_UF', 'SG_UF', 'CO_UF',
+    'NO_MUNICIPIO', 'CO_MUNICIPIO', 'NO_MESORREGIAO', 'CO_MESORREGIAO',
+    'NO_MICRORREGIAO', 'CO_MICRORREGIAO', 'QT_MAT_BAS', 'QT_MAT_EJA', 'QT_MAT_ESP', 'QT_MAT_FUND',
+    'QT_MAT_INF', 'QT_MAT_MED', 'QT_MAT_PROF'
+]
+
+for chunk in df_chunks:
+    escola = chunk[colunas_escola]
+
+    for _, row in escola.iterrows():
+        cursor.execute(
+            """
+            INSERT INTO tb_instituicao (
+                co_entidade, no_entidade, nu_ano_censo, no_regiao, co_regiao, no_uf, sg_uf, co_uf,
+                no_municipio, co_municipio, no_mesorregiao, co_mesorregiao,
+                no_microrregiao, co_microrregiao, qt_mat_bas, qt_mat_eja, qt_mat_esp,
+                qt_mat_fund, qt_mat_inf, qt_mat_med, qt_mat_prof
+            ) VALUES (
+                %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s
+            )
+            ON CONFLICT (co_entidade) DO NOTHING
+            """,
+            tuple(row.fillna(None))
+        )
+    conn.commit()
+
+cursor.close()
+conn.close()
