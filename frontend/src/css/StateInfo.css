@@ -1,0 +1,65 @@
+p {
+    padding: 0px;
+    margin: 0px;
+}
+.state-info-card {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: linear-gradient(to bottom right, #ffffff, #f3f4f6);
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    color: #000000;
+    border: 2px solid #f39c12;
+}
+
+.state-info-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.state-info-header img {
+    width: 110px;
+    height: auto;
+    margin-right: 1rem;
+    object-fit: cover;
+    border: 1px solid #d4d4d4;
+    border-radius: 9px;
+}
+
+.state-info-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.state-info-title h2 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+.year-badge {
+    background-color: #2563eb;
+    color: #fff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: inline-block;
+    width: fit-content;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem 1.2rem;
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+.total {
+    grid-column: span 2;
+    font-weight: bold;
+    padding-top: 1rem;
+    border-top: 1px solid #f39c12;
+}
